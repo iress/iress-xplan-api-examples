@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/iress/iress-xplan-api-examples.svg?branch=master)](https://travis-ci.org/iress/iress-xplan-api-examples)
+
 # Example Connecting to Iress Xplan RAPI and EDAI
 A sample project to demonstrate how backend applications can use basic authentication with Iress Xplan Resourceful API 
 and EDAI. This also includes sample code that uses Two Factor Authentication (2FA).
