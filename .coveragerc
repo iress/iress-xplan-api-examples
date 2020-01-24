@@ -1,0 +1,9 @@
+[run]
+branch = True
+command_line = -m pytest .
+
+[report]
+omit = */*_test.*
+include =
+    ./*.py
+    ./*/*.py
