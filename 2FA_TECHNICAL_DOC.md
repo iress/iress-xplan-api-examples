@@ -4,16 +4,18 @@
 When 2FA is enabled and mandatory for an Xplan site and basic authentication is needed to authenticate to Xplan's API 
 we will need to pass the One Time Password (OTP) along with the username and password in the 
 `Authorization` header. The password and the OTP are separated by `\n\r\t\u0007`. So the `Authorization` header 
-value will be `Basic Base64Hash` where the `Base64Hash` is the Base64 hash of the username, password and OTP in the
+value will be `Basic Base64EncodedString` where the `Base64EncodedString` is the Base64 encoded string of the username, password and OTP in the
  format `USER:PASSWORD\n\r\t\u0007OTP`.
 
 #### Example
 ```
 USER = dummy-user
 PASSWORD = dummy-pwd
-OTP = MR2W23LZFVXXI4C7ONSWG4TFOQ
+OTP Secret = MR2W23LZFVXXI4C7ONSWG4TFOQ
+OTP = 109885
+String for Base64 encoding = dummy-user:dummy-pwd\n\r\t\u0007109885
 
-Base64 Hash = ZHVtbXktdXNlcjpkdW1teS1wd2QKDQkHMTA5ODg1
+Base64 Encoded String = ZHVtbXktdXNlcjpkdW1teS1wd2QKDQkHMTA5ODg1
 
 Authorization Header = Basic ZHVtbXktdXNlcjpkdW1teS1wd2QKDQkHMTA5ODg1
 ```
