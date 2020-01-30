@@ -1,17 +1,18 @@
 [![Build Status](https://travis-ci.org/iress/iress-xplan-api-examples.svg?branch=master)](https://travis-ci.org/iress/iress-xplan-api-examples)
 
 # Example Connecting to Iress Xplan RAPI and EDAI
-A sample project to demonstrate how backend applications can use basic authentication with Iress Xplan Resourceful API 
+These sample projects demonstrate how backend applications can use basic authentication with Iress Xplan Resourceful API 
 and EDAI. This also includes sample code that uses Two Factor Authentication (2FA).
 
 _**Note:** 2FA for the user must use the `Software Token` method._
 
-## Pre-requisites
+## Python Pre-requisites
 Please see `Pipfile` for the Python dependencies.
 
 ## Usage
-To view the current usage/help please run the below command:
+To view the current usage/help please run the below commands:
 
+`$ cd src/python`
 `$ python3 ./run.py -h`
 
 #### Examples
@@ -59,3 +60,17 @@ _**Note:**_
 
 ## Licence
 MIT License (See the included [Licence](LICENSE) file for more information).
+
+#CSharp
+This example calls the API and supplies a 2FA auth token. Be sure to update your credentials in the [XPlanApiCaller](src/csharp/classes/XPlanApiCaller.cs)` file.
+
+##Pre-requisites
+Dot net 4.7.1. Could easily run on dot net core, just use `OtpSharp.Core` package instead.
+
+##Compiling
+cd src/csharp
+nuget restore
+msbuild
+
+##Executing
+xplan_totp
