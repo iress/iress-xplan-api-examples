@@ -61,16 +61,16 @@ _**Note:**_
 ## Licence
 MIT License (See the included [Licence](LICENSE) file for more information).
 
-#CSharp
+# CSharp
 This example calls the API and supplies a 2FA auth token. Be sure to update your credentials in the [XPlanApiCaller](src/csharp/classes/XPlanApiCaller.cs)` file.
 
-##Pre-requisites
+## Pre-requisites
 Dot net 4.7.1. Could easily run on dot net core, just use `OtpSharp.Core` package instead.
 
-##Compiling
+## Compiling
 cd src/csharp
 nuget restore
 msbuild
 
-##Executing
-xplan_totp
+## Executing
+cd xplan-totp/debug/bin/xplan_totp.exe
