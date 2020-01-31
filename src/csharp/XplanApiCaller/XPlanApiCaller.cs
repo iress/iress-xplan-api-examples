@@ -1,32 +1,25 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
-namespace xplan_totp
+namespace XplanApiCaller
 {
     public class XPlanApiCaller
-    { 
-
-        public async Task<List<Client>> GetClientsAsync()
+    {
+        public async Task<List<Client>> GetClientsAsync(string user, string password, string apiID, string secretKey)
         {
-            string baseUrl = "https://xplan.iress.com.au/resourceful/entity/client/";
+            const string BASE_URL = "https://xplan.iress.com.au/resourceful/entity/client/";
 
-            string USER = "myusername";
-            string PASSWORD = "mypassword";
-            string apiID = "myappID";
-            string secretKey = "mySecretKey";
-
-            string EncodedAuth = GetAuthHeaderForXPlan(USER, PASSWORD, secretKey);
+            string EncodedAuth = GetAuthHeaderForXPlan(user, password, secretKey);
 
             using (HttpClient hc = new HttpClient())
             {
-                hc.BaseAddress = new Uri(baseUrl);
+                hc.BaseAddress = new Uri(BASE_URL);
                 hc.DefaultRequestHeaders.Add("Authorization", "Basic " + EncodedAuth);
                 hc.DefaultRequestHeaders.Add("X-Xplan-App-Id", apiID);
-                
+
                 var result = await hc.GetAsync("?_method=GET");
 
                 result.EnsureSuccessStatusCode();
@@ -43,7 +36,11 @@ namespace xplan_totp
 
             if (SecretKey != null)
             {
+#if NETCOREAPP2_0
+                byte[] decodedKey = Wiry.Base32.Base32Encoding.Standard.ToBytes(SecretKey);
+#else
                 byte[] decodedKey = Base32.Base32Encoder.Decode(SecretKey);
+#endif
                 OtpSharp.Totp otp = new OtpSharp.Totp(decodedKey);
                 string OTP = otp.ComputeTotp();
                 authString += $"\n\r\t\a{OTP}";

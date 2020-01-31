@@ -1,4 +1,4 @@
-﻿namespace xplan_totp
+﻿namespace XplanApiCaller
 {
     public class Client
     {

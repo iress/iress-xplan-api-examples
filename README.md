@@ -65,7 +65,7 @@ MIT License (See the included [Licence](LICENSE) file for more information).
 This example calls the API and supplies a 2FA auth token. Be sure to update your credentials in the [XPlanApiCaller](src/csharp/classes/XPlanApiCaller.cs)` file.
 
 ## Pre-requisites
-Dot net 4.7.1. Could easily run on dot net core, just use `OtpSharp.Core` package instead.
+DotNet 4.5+ or DotNet Core 2.0+
 
 ## Compiling
 cd src/csharp
