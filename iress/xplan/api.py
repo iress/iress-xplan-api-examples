@@ -1,18 +1,19 @@
 import base64
+from typing import Dict
 from urllib import response
 from urllib.parse import urljoin
 
 import requests
 from pyotp import TOTP
 
-# Xplan uses the below unique string to unpack the password and OTP when authenticating
 from iress.xplan.session import Session
 
+# Xplan uses the below unique string to unpack the password and OTP when authenticating
 _OTP_SEPARATOR = "\n\r\t\u0007"
 
 
 class ResourcefulAPICall:
-    def __init__(self, session: Session, api_path: str):
+    def __init__(self, session: Session, api_path: str) -> None:
         """
         Resourceful API class for using Xplan API
 
@@ -23,12 +24,10 @@ class ResourcefulAPICall:
         self.session = session
         self.api_path = api_path
 
-    def call_content(self):
+    def call_content(self) -> bytes:
         resp = self.call()
         if resp.status_code != 200:
-            raise Exception(
-                f'HTTP status code {resp.status_code}, error "{resp.reason}".'
-            )
+            resp.raise_for_status()
         return resp.content
 
     def call(self) -> response:
@@ -45,7 +44,7 @@ class ResourcefulAPICall:
             urljoin(f"{self.session.base_url}/", "resourceful/"), self.api_path
         )
 
-    def _get_request_headers(self) -> {str: str}:
+    def _get_request_headers(self) -> Dict[str, str]:
         return {"X-Xplan-App-Id": self.session.client_id, "Accept": "application/json"}
 
 
@@ -57,7 +56,7 @@ class ResourcefulAPIBasicAuth(ResourcefulAPICall):
         user: str,
         pwd: str,
         otp_secret: str = None,
-    ):
+    ) -> None:
         """
         Resourceful API class for authenticating and using Xplan API
 
@@ -75,7 +74,7 @@ class ResourcefulAPIBasicAuth(ResourcefulAPICall):
         self.pwd = pwd
         self.otp_secret = otp_secret
 
-    def _get_request_headers(self) -> {str: str}:
+    def _get_request_headers(self) -> Dict[str, str]:
         headers = super()._get_request_headers()
         headers["Authorization"] = self._get_authorization()
         return headers
