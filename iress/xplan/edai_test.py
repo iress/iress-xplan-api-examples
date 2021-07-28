@@ -7,6 +7,9 @@ import responses
 from iress.xplan.edai import EDAICall
 from iress.xplan.session import Session
 
+_RPC_URL = "https://dev.xplan.iress.com.au/RPC2"
+_DUMMY_PATH = "my/dummy/path"
+
 
 class _MockSession(Session):
     @property
@@ -20,12 +23,12 @@ class TestEDAICall(TestCase):
         self.edai_call = EDAICall(self.session)
 
         responses.add(
-            responses.POST, "https://dev.xplan.iress.com.au/RPC2", json="", status=200
+            responses.POST, _RPC_URL, json="", status=200
         )
 
     @mock.patch("iress.xplan.edai.time.time")
     @responses.activate
-    def test_call_test_parameters(self, time_mk):
+    def test_call_test_parameters(self, time_mk) -> None:
         # Set up
         time_mk.return_value = 1577068503.711234
         params = ["xplan-session-cookie", "param-1", "param-2"]
@@ -43,9 +46,9 @@ class TestEDAICall(TestCase):
         assert responses.calls[0].request.body == expected
 
     @responses.activate
-    def test_call_test_url(self):
+    def test_call_test_url(self) -> None:
         # Set up
-        expected = "https://dev.xplan.iress.com.au/RPC2"
+        expected = _RPC_URL
 
         # Execute
         self.edai_call.call(method="test_m", params=[])
@@ -54,7 +57,7 @@ class TestEDAICall(TestCase):
         assert responses.calls[0].request.url == expected
 
     @responses.activate
-    def test_call_test_headers(self):
+    def test_call_test_headers(self) -> None:
         # Execute
         self.edai_call.call(method="test_m", params=[])
 
@@ -65,7 +68,7 @@ class TestEDAICall(TestCase):
         assert resp_headers["Origin"] == self.session.base_url
 
     @responses.activate
-    def test_call_test_cookies(self):
+    def test_call_test_cookies(self) -> None:
         # Execute
         self.edai_call.call(method="test_m", params=[])
 
@@ -77,13 +80,13 @@ class TestEDAICall(TestCase):
 
     @mock.patch("iress.xplan.edai.EDAICall.call")
     @responses.activate
-    def test_get_value(self, call_mk):
+    def test_get_value(self, call_mk) -> None:
         # Execute
-        self.edai_call.get_value(path="my/dummy/path")
+        self.edai_call.get_value(path=_DUMMY_PATH)
 
         # Verify
         assert call_mk.call_args[1]["method"] == "GetVal"
-        assert call_mk.call_args[1]["params"][0] == "my/dummy/path"
+        assert call_mk.call_args[1]["params"][0] == _DUMMY_PATH
 
 
 class TestEDAICallError(TestCase):
@@ -92,16 +95,16 @@ class TestEDAICallError(TestCase):
         self.edai_call = EDAICall(self.session)
 
     @responses.activate
-    def test_http_error(self):
+    def test_http_error(self) -> None:
         """Should throw an exception if http error occurs"""
         # setup
         responses.add(
-            responses.POST, "https://dev.xplan.iress.com.au/RPC2", json="", status=401
+            responses.POST, _RPC_URL, json="", status=401
         )
 
         # execute
         with pytest.raises(Exception) as err:
-            self.edai_call.get_value(path="my/dummy/path")
+            self.edai_call.get_value(path=_DUMMY_PATH)
 
         # Verify
-        assert err.value.args[0] == 'HTTP status code 401, error "Unauthorized".'
+        assert err.value.args[0] == '401 Client Error: Unauthorized for url: https://dev.xplan.iress.com.au/RPC2'
