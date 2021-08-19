@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import pytest
 import responses
@@ -8,6 +9,9 @@ from iress.xplan.api import ResourcefulAPICall, ResourcefulAPIBasicAuth
 from iress.xplan.session import Session
 
 _CLIENT_ID = "dummy-client_id"
+_BASE_URL = "https://dev.xplan.iress.com.au"
+_CLIENT_V4_PATH = "entity/client-v4"
+_CLIENT_V4_URL = f"{_BASE_URL}/resourceful/{_CLIENT_V4_PATH}"
 
 
 class _AuthMocker:
@@ -25,31 +29,31 @@ class _AuthMocker:
 
 class TestResourcefulAPICall(TestCase):
     @responses.activate
-    def test_url(self):
+    def test_url(self) -> None:
         """Should call the correct resourceful URL"""
         # setup
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="dummy-response",
             status=200,
         )
 
         # execute
         result = self._execute_ResourcefulAPICall_with(
-            base_url="https://dev.xplan.iress.com.au", path="entity/client-v4"
+            base_url=_BASE_URL, path=_CLIENT_V4_PATH
         )
 
         # verify
         self._verify_responses_mock_was_called(result)
 
     @responses.activate
-    def test_http_error(self):
+    def test_http_error(self) -> None:
         """Should throw an exception if http error occurs"""
         # setup
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="",
             status=401,
         )
@@ -57,42 +61,43 @@ class TestResourcefulAPICall(TestCase):
         # execute
         with pytest.raises(Exception) as err:
             self._execute_ResourcefulAPICall_with(
-                base_url="https://dev.xplan.iress.com.au", path="entity/client-v4"
+                base_url=_BASE_URL, path=_CLIENT_V4_PATH
             )
 
         # Verify
-        assert err.value.args[0] == 'HTTP status code 401, error "Unauthorized".'
+        assert err.value.args[0] == ('401 Client Error: Unauthorized for url: '
+                                     'https://dev.xplan.iress.com.au/resourceful/entity/client-v4')
 
     @staticmethod
-    def _execute_ResourcefulAPICall_with(base_url, path):
+    def _execute_ResourcefulAPICall_with(base_url, path) -> Any:
         global _CLIENT_ID
         session = Session(base_url, _CLIENT_ID)
         client = ResourcefulAPICall(session, path)
         return json.loads(client.call_content())
 
     @staticmethod
-    def _verify_responses_mock_was_called(result):
+    def _verify_responses_mock_was_called(result) -> None:
         expected_result = responses.calls[0].response.json()
         assert result == expected_result
         assert len(responses.calls) == 1
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_get_request_headers(self, totp_tc):
+    def test_get_request_headers(self, totp_tc) -> None:
         """Should send Xplan App Id and Accept headers"""
         global _CLIENT_ID
 
         # setup
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="dummy-response",
             status=200,
         )
 
         # execute
         self._execute_ResourcefulAPICall_with(
-            base_url="https://dev.xplan.iress.com.au", path="entity/client-v4"
+            base_url=_BASE_URL, path=_CLIENT_V4_PATH
         )
 
         # verify
@@ -102,19 +107,19 @@ class TestResourcefulAPICall(TestCase):
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_gen_authorization(self, totp_tc):
+    def test_gen_authorization(self, totp_tc) -> None:
         """Should send correct OTP with request"""
         # setup
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="dummy-response",
             status=200,
         )
 
         # execute
         self._execute_ResourcefulAPICall_with(
-            base_url="https://dev.xplan.iress.com.au", path="entity/client-v4"
+            base_url=_BASE_URL, path=_CLIENT_V4_PATH
         )
 
         # verify
@@ -123,7 +128,7 @@ class TestResourcefulAPICall(TestCase):
 
 class TestResourcefulAPIAuth(TestCase):
     @staticmethod
-    def _execute_ResourcefulAPICall_with(base_url, path):
+    def _execute_ResourcefulAPICall_with(base_url, path) -> Any:
         global _CLIENT_ID
         session = Session(base_url, _CLIENT_ID)
         client = ResourcefulAPIBasicAuth(
@@ -133,19 +138,19 @@ class TestResourcefulAPIAuth(TestCase):
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_gen_otp(self, totp_tc):
+    def test_gen_otp(self, totp_tc) -> None:
         """Should send correct OTP with request"""
         # setup
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="dummy-response",
             status=200,
         )
 
         # execute
         self._execute_ResourcefulAPICall_with(
-            base_url="https://dev.xplan.iress.com.au", path="entity/client-v4"
+            base_url=_BASE_URL, path=_CLIENT_V4_PATH
         )
 
         # verify
@@ -155,7 +160,7 @@ class TestResourcefulAPIAuth(TestCase):
         )
 
     @responses.activate
-    def test_no_otp(self):
+    def test_no_otp(self) -> None:
         """Should send basic auth string without OTP with request"""
         global _CLIENT_ID
 
@@ -163,14 +168,14 @@ class TestResourcefulAPIAuth(TestCase):
         session = Session("https://dev.xplan.iress.com.au/", _CLIENT_ID)
         responses.add(
             responses.GET,
-            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4",
+            _CLIENT_V4_URL,
             json="dummy-response",
             status=200,
         )
 
         # execute
         client = ResourcefulAPIBasicAuth(
-            session, "entity/client-v4", "dummy-user", "dummy-pwd"
+            session, _CLIENT_V4_PATH, "dummy-user", "dummy-pwd"
         )
         json.loads(client.call_content())
 

@@ -1,4 +1,4 @@
-from unittest import TestCase, mock
+from unittest import TestCase
 
 import responses
 
@@ -21,7 +21,7 @@ class TestSession(TestCase):
         )
 
     @responses.activate
-    def test_session_id_and_entity_id(self):
+    def test_session_id_and_entity_id(self) -> None:
         # Execute
         self.session.authenticate(
             user="dummy-user", pwd="dummy-pwd", otp_secret=_OTP_SECRET
@@ -32,7 +32,7 @@ class TestSession(TestCase):
         assert self.session.entity_id == 1234
 
     @responses.activate
-    def test_cookies(self):
+    def test_cookies(self) -> None:
         # Execute
         self.session.authenticate(
             user="dummy-user", pwd="dummy-pwd", otp_secret=_OTP_SECRET
