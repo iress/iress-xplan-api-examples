@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Running Unit Tests and Coverage"
+echo "Installing dependencies..."
+devbox run install
 
-coverage run
-coverage report
+echo "Linting code..."
+devbox run lint
+
+echo "Running Unit Tests and Coverage..."
+devbox run test

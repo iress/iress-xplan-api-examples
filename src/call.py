@@ -1,27 +1,25 @@
-#!/usr/bin/env python3
+# type: ignore
+# !/usr/bin/env python3
 
 # vi:syntax=python
 
 import sys
 from argparse import ArgumentParser, Namespace
 from getpass import getpass
-from typing import List, Optional
 
 from iress.xplan.api import ResourcefulAPICall
 from iress.xplan.edai import EDAICall
 from iress.xplan.session import Session
 
 
-def _get_secrets(options: Optional[Namespace]):
+def _get_secrets(options: Namespace | None) -> None:
     if not options.password:
-        options.password = getpass(
-            prompt="Password for {user}: ".format(user=options.user_name)
-        )
+        options.password = getpass(prompt=f"Password for {options.user_name}: ")
     if not options.otp_secret and options.use_tfa:
         options.otp_secret = getpass(prompt="OTP Secret: ")
 
 
-def get_arguments(argv: List) -> Optional[Namespace]:
+def get_arguments(argv: list) -> Namespace | None:
     parser = ArgumentParser()
     parser.add_argument(
         "--base-url",
@@ -35,7 +33,8 @@ def get_arguments(argv: List) -> Optional[Namespace]:
     parser.add_argument(
         "--otp-secret",
         "-o",
-        help="The One Time Password (OTP) secret, if not provided the script will prompt the user.",
+        help="The One Time Password (OTP) secret,"
+        " if not provided the script will prompt the user.",
     )
     parser.add_argument("--user-name", "-u", help="The Xplan user name.", required=True)
     parser.add_argument(
@@ -57,26 +56,26 @@ def get_arguments(argv: List) -> Optional[Namespace]:
         "--edai-example", "-edai", help="Run the EDAI example.", action="store_true"
     )
 
-    known_args, unknown_args = parser.parse_known_args(args=argv)
+    known_args, _ = parser.parse_known_args(args=argv)
     _get_secrets(known_args)
 
     return known_args
 
 
-def api_example(session: Session):
+def api_example(session: Session) -> None:
     client = ResourcefulAPICall(session=session, api_path="entity/client-v4")
 
     print(client.call_content())
 
 
-def edai_example(session: Session):
+def edai_example(session: Session) -> None:
     client = EDAICall(session=session)
 
     print(client.get_value(path=f"entitymgr/user/{session.entity_id}/field/last_name"))
     print(client.get_value(path=f"entitymgr/user/{session.entity_id}/field/first_name"))
 
 
-def call(session: Session, options: Optional[Namespace]):
+def call(session: Session, options: Namespace | None) -> None:
     if options.edai_example:
         edai_example(session)
     else:

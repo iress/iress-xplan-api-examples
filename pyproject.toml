@@ -1,0 +1,91 @@
+[project]
+name = "iress-xplan-api-examples"
+requires-python = ">=3.13"
+version = "1.0"
+
+dependencies = [
+    "pyotp",
+    "requests",
+    "urllib3"
+]
+
+[dependency-groups]
+dev = [
+    "coverage",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "responses",
+    "ruff",
+    "types-requests"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = [
+    # omit anything in a .local directory anywhere
+    "*/.local/*",
+    # Omit any test files
+    "*/*_test.py",
+]
+
+# [tool.coverage.xml]
+# output = "./coverage.xml"
+
+[tool.mypy]
+platform="linux"
+
+show_column_numbers=true
+show_error_context=false
+error_summary=true
+
+# treat Optional per PEP 484
+strict_optional=true
+strict_equality=true
+
+# https://mypy.readthedocs.io/en/stable/config_file.html#configuring-warnings
+warn_redundant_casts=true
+warn_unused_ignores=true
+warn_unreachable=true
+warn_no_return=true
+warn_return_any=true
+
+# Be real strict on using types
+check_untyped_defs=true
+disallow_incomplete_defs=true
+disallow_untyped_calls=true
+disallow_untyped_decorators=false
+disallow_untyped_defs=true
+
+# Support for types is not yet available
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration (these are not run by default)."
+]
+
+[tool.ruff]
+line-length = 90
+preview = true
+
+[tool.ruff.lint]
+select = [
+    "F", "E", "W", "C90", "I", "N", "D2", "UP", "YTT", "ANN", "ASYNC", "S",
+    "B", "A", "C4", "DTZ", "T10", "FA", "ISC", "ICN",
+    "LOG", "G", "INP", "PIE", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM",
+    "TID", "TCH", "ARG", "PTH", "TD", "FIX", "ERA", "PL", "TRY", "FLY",
+    "PERF", "FURB", "RUF"
+]
+
+ignore = ["E203", "S101", "S311", "D203", "D211", "D213", "ISC001", "ANN401", "TRY003", "ERA001", "PLW0603"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 6
+
+[tool.ruff.lint.per-file-ignores]
+"*_test.py" = ["S105", "FBT", "PLR2004", "PLR6301", "PLC2801"]

@@ -1,0 +1,21 @@
+{
+  "name":     "iress-xplan-api-examples",
+  "packages": [
+    "python@3.14",
+    "uv@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      ". ${VENV_DIR}/bin/activate"
+    ],
+    "scripts": {
+      "call": "scripts/call.sh \"$@\"",
+      "format": "scripts/format.sh \"$@\"",
+      "help": "scripts/help.sh \"$@\"",
+      "install": "scripts/install.sh \"$@\"",
+      "lint": "scripts/lint.sh \"$@\"",
+      "test": "scripts/test.sh \"$@\"",
+      "upgrade": "scripts/upgrade.sh \"$@\""
+    }
+  }
+}

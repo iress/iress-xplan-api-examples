@@ -1,11 +1,9 @@
-FROM python:3.8.1-alpine
+FROM jetpackio/devbox:latest
 
-RUN apk add bash
-RUN pip install pipenv
+USER root:root
 
 ADD . /app
 
 WORKDIR /app
-RUN pipenv install --dev --system --deploy --ignore-pipfile
 
 CMD ["./ci/_test.sh"]
