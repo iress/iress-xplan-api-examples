@@ -1,11 +1,13 @@
 import base64
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 import requests
 from pyotp import TOTP
 
-from iress.xplan.session import Session
+if TYPE_CHECKING:
+    from iress.xplan.session import Session
 
 # Xplan uses the below unique string to unpack the password and OTP when authenticating
 _OTP_SEPARATOR = "\n\r\t\u0007"

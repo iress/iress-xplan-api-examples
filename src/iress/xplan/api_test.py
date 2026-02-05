@@ -1,13 +1,15 @@
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest import TestCase, mock
-from unittest.mock import Mock
 
 import pytest
 import responses
 
 from iress.xplan.api import ResourcefulAPIBasicAuth, ResourcefulAPICall
 from iress.xplan.session import Session
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
 
 _CLIENT_ID = "dummy-client_id"
 _BASE_URL = "https://dev.xplan.iress.com.au"

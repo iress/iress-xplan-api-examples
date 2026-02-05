@@ -1,10 +1,14 @@
 # type: ignore
 from argparse import Namespace
+from typing import TYPE_CHECKING
 from unittest import TestCase, mock
-from unittest.mock import Mock
 
 from call import call, get_arguments
 from iress.xplan.session import Session
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
+
 
 _RAW_ARGS = [
     "-b",

@@ -1,12 +1,15 @@
 import json
+from typing import TYPE_CHECKING
 from unittest import TestCase, mock
-from unittest.mock import Mock
 
 import pytest
 import responses
 
 from iress.xplan.edai import EDAICall
 from iress.xplan.session import Session
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
 
 _RPC_URL = "https://dev.xplan.iress.com.au/RPC2"
 _DUMMY_PATH = "my/dummy/path"

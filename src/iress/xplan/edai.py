@@ -1,11 +1,12 @@
 import json
 import time
 from http import HTTPStatus
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import requests
 
-from iress.xplan.session import Session
+if TYPE_CHECKING:
+    from iress.xplan.session import Session
 
 
 class EDAICall:
