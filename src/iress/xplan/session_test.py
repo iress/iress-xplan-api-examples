@@ -7,6 +7,7 @@ from iress.xplan.session import Session
 _TEST_URL = "https://dev.xplan.iress.com.au"
 _OTP_SECRET = "MR2W23LZFVXXI4C7ONSWG4TFOQ"
 _CLIENT_ID = "dummy-client_id"
+_DUMMY_PWD = "dummy-pwd"
 
 
 class TestSession(TestCase):
@@ -24,7 +25,7 @@ class TestSession(TestCase):
     def test_session_id_and_entity_id(self) -> None:
         # Execute
         self.session.authenticate(
-            user="dummy-user", pwd="dummy-pwd", otp_secret=_OTP_SECRET
+            user="dummy-user", pwd=_DUMMY_PWD, otp_secret=_OTP_SECRET
         )
 
         # Verify
@@ -35,7 +36,7 @@ class TestSession(TestCase):
     def test_cookies(self) -> None:
         # Execute
         self.session.authenticate(
-            user="dummy-user", pwd="dummy-pwd", otp_secret=_OTP_SECRET
+            user="dummy-user", pwd=_DUMMY_PWD, otp_secret=_OTP_SECRET
         )
 
         # Verify

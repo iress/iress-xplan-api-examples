@@ -7,28 +7,49 @@ and EDAI. This also includes sample code that uses Two Factor Authentication (2F
 _**Note:** 2FA for the user must use the `Software Token` method._
 
 ## Pre-requisites
-Please see `Pipfile` for the Python dependencies.
+- [Devbox](https://www.jetify.com/devbox)
+
+Please see `pyproject.toml` for the Python dependencies.
+
+## Setup
+```bash
+devbox run install
+```
 
 ## Usage
-To view the current usage/help please run the below command:
+To view the current usage/help please run:
 
-`$ python3 ./run.py -h`
+```bash
+devbox run help
+```
+
+Or directly:
+```bash
+python3 src/call.py -h
+```
 
 #### Examples
 
 ##### RAPI using 2FA
-```
-./run.py -b https://dev.xplan.iress.com.au -u testuser -p ASDDsf3sdsf2 -o HTHHH72MQ7CBVX3SU25YRKQO6OAI36TD -i FPj9cymketaHXunJE3E3 -tfa -api
+```bash
+devbox run call -b https://dev.xplan.iress.com.au -u testuser -p ASDDsf3sdsf2 -o HTHHH72MQ7CBVX3SU25YRKQO6OAI36TD -i FPj9cymketaHXunJE3E3 -tfa -api
 ```
 
 ##### EDAI using 2FA
-```
-./run.py -b https://dev.xplan.iress.com.au -u testuser -p ASDDsf3sdsf2 -o HTHHH72MQ7CBVX3SU25YRKQO6OAI36TD -i FPj9cymketaHXunJE3E3 -tfa -edai
+```bash
+devbox run call -b https://dev.xplan.iress.com.au -u testuser -p ASDDsf3sdsf2 -o HTHHH72MQ7CBVX3SU25YRKQO6OAI36TD -i FPj9cymketaHXunJE3E3 -tfa -edai
 ```
 
 _**Note:**_
  - If you don't specify a password using the `-p` option the script will prompt for the password
  - If you don't specify an OTP Secret using the `-o` option the script will prompt for the secret
+
+## Development
+Available commands:
+- `devbox run test` - Run tests
+- `devbox run lint` - Run linting
+- `devbox run format` - Format code
+- `devbox run upgrade` - Upgrade dependencies
 
 **Sample result of the above script:**
 ```

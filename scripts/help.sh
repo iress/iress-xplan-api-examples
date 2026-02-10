@@ -19,7 +19,7 @@ get_script_dir () {
 current_dir="$(get_script_dir)/"
 prefix_len=$((${#current_dir} + 1))
 
-echo -e "\e[1m./ci.sh <task> -- program to run continuous integration and deployment tasks\e[0m"
+echo -e "\e[1mdevbox run <task> -- program to run continuous integration and deployment tasks\e[0m"
 echo ""
 echo "Available tasks:"
 

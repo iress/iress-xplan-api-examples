@@ -1,11 +1,9 @@
 import json
-from typing import Dict
 
 
 class Session:
     def __init__(self, base_url: str, client_id: str) -> None:
-        """
-        Session class to hold Xplan session details.
+        """Session class to hold Xplan session details.
 
         Args:
             base_url (str): The Xplan base URL (everything before `/resourceful/`.
@@ -14,17 +12,17 @@ class Session:
         self.base_url = base_url
         self.client_id = client_id
 
-        self._cookies: Dict[str, str] = {}
+        self._cookies: dict[str, str] = {}
         self._entity_id: int = 0
 
-    def authenticate(self, user: str, pwd: str, otp_secret: str = None) -> None:
-        from iress.xplan.api import ResourcefulAPIBasicAuth
+    def authenticate(self, user: str, pwd: str, otp_secret: str | None = None) -> None:
+        from iress.xplan.api import ResourcefulAPIBasicAuth  # noqa: PLC0415
 
         r_call = ResourcefulAPIBasicAuth(
             self, api_path="session/user", user=user, pwd=pwd, otp_secret=otp_secret
         )
         response = r_call.call()
-        self._cookies = response.cookies
+        self._cookies = response.cookies.get_dict()
 
         raw_content = response.text
         print(response.status_code)
@@ -34,10 +32,10 @@ class Session:
 
     @property
     def session_id(self) -> str:
-        return self.cookies.get("XPLANID")
+        return self.cookies.get("XPLANID", "")
 
     @property
-    def cookies(self) -> Dict[str, str]:
+    def cookies(self) -> dict[str, str]:
         return self._cookies
 
     @property

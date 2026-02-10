@@ -1,12 +1,15 @@
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from unittest import TestCase, mock
 
 import pytest
 import responses
-from unittest import TestCase, mock
 
-from iress.xplan.api import ResourcefulAPICall, ResourcefulAPIBasicAuth
+from iress.xplan.api import ResourcefulAPIBasicAuth, ResourcefulAPICall
 from iress.xplan.session import Session
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
 
 _CLIENT_ID = "dummy-client_id"
 _BASE_URL = "https://dev.xplan.iress.com.au"
@@ -23,7 +26,7 @@ class _AuthMocker:
     expected_auth_string = "Basic ZHVtbXktdXNlcjpkdW1teS1wd2QKDQkHMTA5ODg1"
 
     @classmethod
-    def patch_totp_timecode(cls):
+    def patch_totp_timecode(cls) -> Any:
         return mock.patch("iress.xplan.api.TOTP.timecode", return_value=cls._time_code)
 
 
@@ -40,7 +43,7 @@ class TestResourcefulAPICall(TestCase):
         )
 
         # execute
-        result = self._execute_ResourcefulAPICall_with(
+        result = self._execute_resourceful_api_call_with(
             base_url=_BASE_URL, path=_CLIENT_V4_PATH
         )
 
@@ -59,34 +62,35 @@ class TestResourcefulAPICall(TestCase):
         )
 
         # execute
-        with pytest.raises(Exception) as err:
-            self._execute_ResourcefulAPICall_with(
+        with pytest.raises(
+            Exception, match="401 Client Error: Unauthorized for url"
+        ) as err:
+            self._execute_resourceful_api_call_with(
                 base_url=_BASE_URL, path=_CLIENT_V4_PATH
             )
 
         # Verify
-        assert err.value.args[0] == ('401 Client Error: Unauthorized for url: '
-                                     'https://dev.xplan.iress.com.au/resourceful/entity/client-v4')
+        assert err.value.args[0] == (
+            "401 Client Error: Unauthorized for url: "
+            "https://dev.xplan.iress.com.au/resourceful/entity/client-v4"
+        )
 
     @staticmethod
-    def _execute_ResourcefulAPICall_with(base_url, path) -> Any:
-        global _CLIENT_ID
+    def _execute_resourceful_api_call_with(base_url: str, path: str) -> Any:
         session = Session(base_url, _CLIENT_ID)
         client = ResourcefulAPICall(session, path)
         return json.loads(client.call_content())
 
     @staticmethod
-    def _verify_responses_mock_was_called(result) -> None:
-        expected_result = responses.calls[0].response.json()
+    def _verify_responses_mock_was_called(result: Any) -> None:
+        expected_result = responses.calls[0].response.json()  # type: ignore
         assert result == expected_result
         assert len(responses.calls) == 1
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_get_request_headers(self, totp_tc) -> None:
+    def test_get_request_headers(self, totp_tc: Mock) -> None:  # noqa: ARG002
         """Should send Xplan App Id and Accept headers"""
-        global _CLIENT_ID
-
         # setup
         responses.add(
             responses.GET,
@@ -96,9 +100,7 @@ class TestResourcefulAPICall(TestCase):
         )
 
         # execute
-        self._execute_ResourcefulAPICall_with(
-            base_url=_BASE_URL, path=_CLIENT_V4_PATH
-        )
+        self._execute_resourceful_api_call_with(base_url=_BASE_URL, path=_CLIENT_V4_PATH)
 
         # verify
         headers = responses.calls[0].request.headers
@@ -107,7 +109,7 @@ class TestResourcefulAPICall(TestCase):
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_gen_authorization(self, totp_tc) -> None:
+    def test_gen_authorization(self, totp_tc: Mock) -> None:  # noqa: ARG002
         """Should send correct OTP with request"""
         # setup
         responses.add(
@@ -118,9 +120,7 @@ class TestResourcefulAPICall(TestCase):
         )
 
         # execute
-        self._execute_ResourcefulAPICall_with(
-            base_url=_BASE_URL, path=_CLIENT_V4_PATH
-        )
+        self._execute_resourceful_api_call_with(base_url=_BASE_URL, path=_CLIENT_V4_PATH)
 
         # verify
         assert responses.calls[0].request.headers.get("Authorization") is None
@@ -128,8 +128,7 @@ class TestResourcefulAPICall(TestCase):
 
 class TestResourcefulAPIAuth(TestCase):
     @staticmethod
-    def _execute_ResourcefulAPICall_with(base_url, path) -> Any:
-        global _CLIENT_ID
+    def _execute_resourceful_api_call_with(base_url: str, path: str) -> Any:
         session = Session(base_url, _CLIENT_ID)
         client = ResourcefulAPIBasicAuth(
             session, path, "dummy-user", "dummy-pwd", _AuthMocker.otp_secret
@@ -138,7 +137,7 @@ class TestResourcefulAPIAuth(TestCase):
 
     @responses.activate
     @_AuthMocker.patch_totp_timecode()
-    def test_gen_otp(self, totp_tc) -> None:
+    def test_gen_otp(self, totp_tc: Mock) -> None:  # noqa: ARG002
         """Should send correct OTP with request"""
         # setup
         responses.add(
@@ -149,9 +148,7 @@ class TestResourcefulAPIAuth(TestCase):
         )
 
         # execute
-        self._execute_ResourcefulAPICall_with(
-            base_url=_BASE_URL, path=_CLIENT_V4_PATH
-        )
+        self._execute_resourceful_api_call_with(base_url=_BASE_URL, path=_CLIENT_V4_PATH)
 
         # verify
         assert (
@@ -162,8 +159,6 @@ class TestResourcefulAPIAuth(TestCase):
     @responses.activate
     def test_no_otp(self) -> None:
         """Should send basic auth string without OTP with request"""
-        global _CLIENT_ID
-
         # setup
         session = Session("https://dev.xplan.iress.com.au/", _CLIENT_ID)
         responses.add(

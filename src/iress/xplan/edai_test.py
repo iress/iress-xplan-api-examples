@@ -1,4 +1,5 @@
 import json
+from typing import TYPE_CHECKING
 from unittest import TestCase, mock
 
 import pytest
@@ -7,13 +8,16 @@ import responses
 from iress.xplan.edai import EDAICall
 from iress.xplan.session import Session
 
+if TYPE_CHECKING:
+    from unittest.mock import Mock
+
 _RPC_URL = "https://dev.xplan.iress.com.au/RPC2"
 _DUMMY_PATH = "my/dummy/path"
 
 
 class _MockSession(Session):
     @property
-    def cookies(self):
+    def cookies(self) -> dict[str, str]:
         return {"XPLANID": "xplan-session-cookie"}
 
 
@@ -22,20 +26,20 @@ class TestEDAICall(TestCase):
         self.session = _MockSession("https://dev.xplan.iress.com.au", "sss")
         self.edai_call = EDAICall(self.session)
 
-        responses.add(
-            responses.POST, _RPC_URL, json="", status=200
-        )
+        responses.add(responses.POST, _RPC_URL, json="", status=200)
 
     @mock.patch("iress.xplan.edai.time.time")
     @responses.activate
-    def test_call_test_parameters(self, time_mk) -> None:
+    def test_call_test_parameters(self, time_mk: Mock) -> None:
         # Set up
         time_mk.return_value = 1577068503.711234
         params = ["xplan-session-cookie", "param-1", "param-2"]
         expected = bytearray(
-            json.dumps(
-                {"method": "edai.test_m", "params": params, "id": "1577068503711"}
-            ),
+            json.dumps({
+                "method": "edai.test_m",
+                "params": params,
+                "id": "1577068503711",
+            }),
             "utf-8",
         )
 
@@ -80,7 +84,7 @@ class TestEDAICall(TestCase):
 
     @mock.patch("iress.xplan.edai.EDAICall.call")
     @responses.activate
-    def test_get_value(self, call_mk) -> None:
+    def test_get_value(self, call_mk: Mock) -> None:
         # Execute
         self.edai_call.get_value(path=_DUMMY_PATH)
 
@@ -98,13 +102,16 @@ class TestEDAICallError(TestCase):
     def test_http_error(self) -> None:
         """Should throw an exception if http error occurs"""
         # setup
-        responses.add(
-            responses.POST, _RPC_URL, json="", status=401
-        )
+        responses.add(responses.POST, _RPC_URL, json="", status=401)
 
         # execute
-        with pytest.raises(Exception) as err:
+        with pytest.raises(
+            Exception, match="401 Client Error: Unauthorized for url"
+        ) as err:
             self.edai_call.get_value(path=_DUMMY_PATH)
 
         # Verify
-        assert err.value.args[0] == '401 Client Error: Unauthorized for url: https://dev.xplan.iress.com.au/RPC2'
+        assert (
+            err.value.args[0]
+            == "401 Client Error: Unauthorized for url: https://dev.xplan.iress.com.au/RPC2"
+        )

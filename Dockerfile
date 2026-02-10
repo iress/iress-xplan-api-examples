@@ -1,11 +1,27 @@
-FROM python:3.8.1-alpine
+FROM jetpackio/devbox:latest
 
-RUN apk add bash
-RUN pip install pipenv
+USER root:root
 
-ADD . /app
+RUN rm -rf /homeless-shelter && \
+    mkdir -p /etc/nix && \
+    echo "sandbox = false" > /etc/nix/nix.conf && \
+    echo "build-users-group =" >> /etc/nix/nix.conf
+
+ENV HOME=/tmp
 
 WORKDIR /app
-RUN pipenv install --dev --system --deploy --ignore-pipfile
+RUN chown devbox:devbox /app
 
-CMD ["./ci/_test.sh"]
+USER devbox
+
+# Copy dependency files first for better caching
+COPY --chown=devbox:devbox devbox.json devbox.lock ./
+COPY --chown=devbox:devbox pyproject.toml uv.lock ./
+COPY --chown=devbox:devbox scripts/ ./scripts/
+
+# Install dependencies in separate layer for caching
+RUN devbox run install
+
+# Copy remaining files
+COPY --chown=devbox:devbox ci/ ./ci/
+COPY --chown=devbox:devbox src/ ./src/
